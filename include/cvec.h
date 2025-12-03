@@ -155,6 +155,16 @@ typedef struct {
 } GetValueBool;
 
 typedef struct {
+    short value;			
+    CvecError err;		
+} GetValueShort;
+
+typedef struct {
+    unsigned short value;			
+    CvecError err;		
+} GetValueUshort;
+
+typedef struct {
     int value;			
     CvecError err;		
 } GetValueInt;
