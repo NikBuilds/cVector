@@ -166,22 +166,23 @@ CvecError erase(Cvec *v, size_t index_pos)
  */
 CvecError erase_range(Cvec *v, size_t begin, size_t end)
 {
-	if(v->length > 0)
-	{
-		if(end >= v->length || begin < 0) {
-			return CVEC_ERR_INVALID_RANGE;
-		}
+    if (v->length == 0)
+        return CVEC_ERR_EMPTY;
 
-		void *dest = (char*)v->data + begin * v->element_size;
-		void *src  = (char*)v->data + (end + 1) * v->element_size;
-		size_t bytes_to_move = (v->length - end - 1) * v->element_size;
+    if (begin > end || end >= v->length)
+        return CVEC_ERR_INVALID_RANGE;
 
-		memmove(dest, src, bytes_to_move);
-		v->length = v->length - end;
-		
-		return CVEC_OK;
-	}	
-	return CVEC_ERR_EMPTY;
+    size_t count = end - begin + 1;
+
+    void *dest = (char*)v->data + begin * v->element_size;
+    void *src  = (char*)v->data + (end + 1) * v->element_size;
+    size_t bytes_to_move = (v->length - end - 1) * v->element_size;
+
+    memmove(dest, src, bytes_to_move);
+
+    v->length -= count;
+
+    return CVEC_OK;
 }
 
 CvecError shrink_to_fit(Cvec *v)
