@@ -123,7 +123,7 @@ typedef enum cvec_types {
 
 typedef struct {
     void *data;          // Pointer at the beginning of the Data-Array
-    size_t element_size; // Größe eines Elements (z.B. sizeof(int))
+    size_t element_size; // Size of the element (z.B. sizeof(int))
     size_t length;       // Anzahl der aktuell gespeicherten Elemente
     size_t capacity;     // Anzahl der Elemente, für die aktuell speicher reserviert wird
 	CvecType datatype;	 // Datatype of the vector
@@ -170,6 +170,31 @@ typedef struct {
 } GetValueInt;
 
 typedef struct {
+    unsigned int value;			
+    CvecError err;		
+} GetValueUint;
+
+typedef struct {
+    long value;			
+    CvecError err;		
+} GetValueLong;
+
+typedef struct {
+    unsigned long value;			
+    CvecError err;		
+} GetValueUlong;
+
+typedef struct {
+    long long value;			
+    CvecError err;		
+} GetValueLlong;
+
+typedef struct {
+    unsigned long long value;			
+    CvecError err;		
+} GetValueUllong;
+
+typedef struct {
     float value;		
     CvecError err;		
 } GetValueFloat;
@@ -178,6 +203,11 @@ typedef struct {
     double value;
     CvecError err;
 } GetValueDouble;
+
+typedef struct {
+    long double value;
+    CvecError err;
+} GetValueLdouble;
 
 
 void init_char(Cvec *v);
