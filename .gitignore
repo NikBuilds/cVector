@@ -1,0 +1,9 @@
+build/
+Makefile
+compile_flags.txt
+
+*.o
+*.a
+*.so
+*.exe
+*.txt
