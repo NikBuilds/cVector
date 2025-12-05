@@ -1,15 +1,8 @@
 #include "cvec_internals.h"
 
-
-// Adds a copy of an element at the end of the vector
-/*
- * Local var's:
- *		new_capacity	=	Checks if the vector->capacity is 0 then set it to 1. Else it doubls die cpacity (0 is false in c/c++)
- *		*temp			=	reallocs heap-space based on the new capacity
- *		*target			=	Adress of the next free memoryblock / 'cell' -> First adress + actual length * sizeof(...) = next free adress
- *
- * When adding the first element, the length is 0, so the first element ist at index 0. Only after a element ist added, vector->length in increased by 1.
- */
+// Adds a copy of an element at the end of the vector.
+// If the vector's capacity is 0, then set it to 1. Else doueble the capacity and reallocate new space on the heap.
+// When adding the first element, the length is 0, so the first element ist at index 0. Only after a element ist added, vector->length in increased by 1.
 CvecError push_back(Cvec *v, void *element, CvecType expected_type)
 {
     if (v->datatype != expected_type) {
@@ -18,7 +11,7 @@ CvecError push_back(Cvec *v, void *element, CvecType expected_type)
 
 	if(v->length == v->capacity) 
 	{
-		size_t new_capacity =  v->capacity ? v->capacity * 2 : 1;
+		size_t new_capacity = v->capacity ? v->capacity * 2 : 1;
 		void *temp = realloc(v->data, new_capacity * v->element_size);
 		
 		if(temp == NULL) {
@@ -37,12 +30,8 @@ CvecError push_back(Cvec *v, void *element, CvecType expected_type)
 	return CVEC_OK;
 }
 
-// Gets a copy of the element at index n
-/*
- * This function copys the element at index n and paste it in *dest.
- * Es ist wichtig das eine Kopie zurückgegeben wird, da sonst mit einem Interner Speicher gearbeite wird. 
- * Das könnte zu Fehlern führen wenn sich zum Beispiel per push_back der liniare Speicheradressbereich ändert.
- * */
+// Copies the element at the given index from the vector into the memory pointed to by 'dest'.
+// This ensures the caller receives a standalone copy of the element, rather than a pointer into the vector's internal storae.
 CvecError get_copy(const Cvec *v, size_t index, void *dest) 
 {
 	if (index >= v->length) {
@@ -52,13 +41,7 @@ CvecError get_copy(const Cvec *v, size_t index, void *dest)
 	return CVEC_OK;
 }
 
-// Insert a value at a specific index
-/*
- * Copys the value of *element and puts the copy element into *dest.
-t 
- * Local vars:
- *		*dest = Calculates an offset based on the passed index 
- * */
+// Insert's a value at the given index
 CvecError insert(Cvec *v, size_t index, void *element, CvecType expected_type) 
 {
     if (v->datatype != expected_type) {
