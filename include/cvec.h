@@ -49,20 +49,20 @@
 
 #define cvec_get(v, index, type) \
     _Generic((type)0, \
-        char: get_char, \
-        unsigned char: get_uchar, \
-        char*: get_string, \
-        bool: get_bool, \
-        short: get_short, \
-        int: get_int, \
-        unsigned int: get_uint, \
-        long: get_long, \
-        long long: get_llong, \
-        unsigned long: get_ulong, \
+        char:				get_char, \
+        unsigned char:		get_uchar, \
+        char*:				get_string, \
+        bool:				get_bool, \
+        short:				get_short, \
+        int:				get_int, \
+        unsigned int:		get_uint, \
+        long:				get_long, \
+        long long:			get_llong, \
+        unsigned long:		get_ulong, \
         unsigned long long: get_ullong, \
-        float: get_float, \
-        double: get_double, \
-        long double: get_ldouble \
+        float:				get_float, \
+        double:				get_double, \
+        long double:		get_ldouble \
     )(v, index)
 
 #define cvec_replace(v, index, val) \
@@ -280,6 +280,20 @@ GetValueLdouble get_ldouble(Cvec *v, size_t index);
 
 CvecError erase(Cvec *v, size_t index);
 CvecError erase_range(Cvec *v, size_t begin, size_t end);
+
+CvecError replace_char(Cvec *v, size_t index, char element);
+CvecError replace_uchar(Cvec *v, size_t index, unsigned char element);
+CvecError replace_string(Cvec *v, size_t index, const char* str);
+CvecError replace_short(Cvec *v, size_t index, short element);
+CvecError replace_int(Cvec *v, size_t index, int element);
+CvecError replace_uint(Cvec *v, size_t index, unsigned int element);
+CvecError replace_long(Cvec *v, size_t index, long element);
+CvecError replace_llong(Cvec *v, size_t index, long long element);
+CvecError replace_ulong(Cvec *v, size_t index, unsigned long element);
+CvecError replace_ullong(Cvec *v, size_t index, unsigned long long element);
+CvecError replace_float(Cvec *v, size_t index, float element);
+CvecError replace_double(Cvec *v, size_t index, double element);
+CvecError replace_ldouble(Cvec *v, size_t index, long double element);
 
 CvecError insert_char(Cvec *v, size_t index, char element);
 CvecError insert_uchar(Cvec *v, size_t index, unsigned char element);

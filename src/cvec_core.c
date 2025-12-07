@@ -86,7 +86,7 @@ CvecError replace(Cvec *v, size_t index, void *element, CvecType expected_type)
 
 // Inserts a value at the given index.
 // By adding a new element at the given index, all next elements are moved to the right.
-// It can only insert values if the vector has content.
+// It can only insert values if the vctor is not empty.
 CvecError insert(Cvec *v, size_t index, void *element, CvecType expected_type) 
 {
 	if(v == NULL) return CVEC_ERR_NULL;
