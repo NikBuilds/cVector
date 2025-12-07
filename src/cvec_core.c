@@ -58,9 +58,9 @@ CvecError replace(Cvec *v, size_t index, void *element, CvecType expected_type)
 {
 	if (v == NULL) return CVEC_ERR_NULL;
 	if (element == NULL) return CVEC_ERR_NULL;
-	if (v->datatype != expected_type) return CVEC_ERR_TYPE;
 	if (v->length == 0) return CVEC_ERR_EMPTY;
 	if (index >= v->length) return CVEC_ERR_INDEX_OUT_OF_BOUNDS;
+	if (v->datatype != expected_type) return CVEC_ERR_TYPE;
 	
 	if(v->length == v->capacity) 
 	{
@@ -92,12 +92,12 @@ CvecError replace(Cvec *v, size_t index, void *element, CvecType expected_type)
 // It can only insert values if the vctor is not empty.
 CvecError insert(Cvec *v, size_t index, void *element, CvecType expected_type) 
 {
-	if(v == NULL) return CVEC_ERR_NULL;
+	if (v == NULL) return CVEC_ERR_NULL;
 	if (element == NULL) return CVEC_ERR_NULL;
-	if (v->datatype != expected_type) return CVEC_ERR_TYPE;
 	if (v->length == 0) return CVEC_ERR_EMPTY;
 	if (index >= v->length) return CVEC_ERR_INDEX_OUT_OF_BOUNDS;
-	if(v->capacity > SIZE_MAX / 2) return CVEC_ERR_OVERFLOW;
+	if (v->capacity > SIZE_MAX / 2) return CVEC_ERR_OVERFLOW;
+	if (v->datatype != expected_type) return CVEC_ERR_TYPE;
 
     if (v->length == v->capacity) 
 	{
@@ -117,14 +117,14 @@ CvecError insert(Cvec *v, size_t index, void *element, CvecType expected_type)
         v->capacity = new_capacity;
     }
 
-    void *dest = (char*)v->data + (index + 1) * v->element_size;
-    void *src  = (char*)v->data + index * v->element_size;
-    size_t bytes_to_move = (v->length - index) * v->element_size;
+    void *dest = (char*)v->data + (index + 1) * v->element_size;	// Pointer to the new position where the cvec elements will be moved (index + count)
+    void *src  = (char*)v->data + index * v->element_size;			// Pointer to the first element in cvec to be moved (index position)
+    size_t bytes_to_move = (v->length - index) * v->element_size;	// Calculated number of bytes that need to be moved
 
     if (bytes_to_move) memmove(dest, src, bytes_to_move);
 
-    void *insert_pos = (char*)v->data + index * v->element_size;
-    memcpy(insert_pos, element, v->element_size);
+    void *insert_pos = (char*)v->data + index * v->element_size;	// Position where the new elements are inserted
+    memcpy(insert_pos, element, v->element_size);					// Copies count elements form arr into the vector
     
 	v->length++;
 	return CVEC_OK;
@@ -134,10 +134,11 @@ CvecError insert(Cvec *v, size_t index, void *element, CvecType expected_type)
 // Inserts an array of 'count' elements into the vector at the given index.
 CvecError insert_range(Cvec *v, size_t index, size_t count, void *arr, CvecType expected_type) 
 {
-    if (v->datatype != expected_type) return CVEC_ERR_TYPE;
-    if (index > v->length) return CVEC_ERR_INDEX_OUT_OF_BOUNDS;
+	if (v == NULL) return CVEC_ERR_NULL;
 	if (arr == NULL && count > 0) return CVEC_ERR_NULL_INPUT;
+    if (index > v->length) return CVEC_ERR_INDEX_OUT_OF_BOUNDS;
 	if (count > SIZE_MAX / v->element_size) return CVEC_ERR_OVERFLOW;
+    if (v->datatype != expected_type) return CVEC_ERR_TYPE;
 
     size_t new_length = v->length + count;
 
@@ -149,9 +150,9 @@ CvecError insert_range(Cvec *v, size_t index, size_t count, void *arr, CvecType 
 		}
 
 		while (new_capacity < new_length) {
-			if (new_capacity > SIZE_MAX / 2) {
+			if (new_capacity > SIZE_MAX / 2) 
 				return CVEC_ERR_OVERFLOW;
-			}
+			
 			new_capacity *= 2;
 		}
 
@@ -256,4 +257,3 @@ void cvec_free(Cvec *v)
     v->length = 0;
     v->capacity = 0;
 }
-
