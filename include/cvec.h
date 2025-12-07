@@ -324,6 +324,6 @@ CvecError insert_range_double(Cvec *v, size_t index, double *arr, size_t arr_len
 CvecError insert_range_ldouble(Cvec *v, size_t index, long double *arr, size_t arr_length);
 
 CvecError shrink_to_fit(Cvec *v);
-void cvec_free(Cvec *v);
+CvecError cvec_free(Cvec *v);
 
 #endif

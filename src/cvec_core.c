@@ -88,7 +88,7 @@ CvecError replace(Cvec *v, size_t index, void *element, CvecType expected_type)
 
 
 // Inserts a value at the given index.
-// By adding a new element at the given index, all next elements are moved to the right.
+// By adding a new element, all next elements are moved to the right.
 // It can only insert values if the vctor is not empty.
 CvecError insert(Cvec *v, size_t index, void *element, CvecType expected_type) 
 {
@@ -145,9 +145,7 @@ CvecError insert_range(Cvec *v, size_t index, size_t count, void *arr, CvecType 
     if (new_length > v->capacity) {
 		size_t new_capacity = v->capacity;
 
-		if (new_capacity == 0) {
-			new_capacity = 1;
-		}
+		if (new_capacity == 0) new_capacity = 1;
 
 		while (new_capacity < new_length) {
 			if (new_capacity > SIZE_MAX / 2) 
@@ -184,16 +182,13 @@ CvecError insert_range(Cvec *v, size_t index, size_t count, void *arr, CvecType 
 
 // Deletes one element
 // To delete an element, all elements after index_pos are moved to the given index.
-// This overwrites the element that is to be deleted.
+// This overwrites the element that has to be deleted.
+// Vector cannot be empty.
 CvecError erase(Cvec *v, size_t index_pos) 
 {
-    if (v->length == 0) {
-        return CVEC_ERR_EMPTY;
-    }
-
-    if (index_pos >= v->length) {
-        return CVEC_ERR_INDEX_OUT_OF_BOUNDS;
-    }
+	if (v == NULL) return CVEC_ERR_NULL;
+    if (v->length == 0) return CVEC_ERR_EMPTY;
+    if (index_pos >= v->length) return CVEC_ERR_INDEX_OUT_OF_BOUNDS;
 
     void *dest = (char *)v->data + index_pos * v->element_size;
     void *src = (char *)v->data + (index_pos + 1) * v->element_size;
@@ -207,15 +202,13 @@ CvecError erase(Cvec *v, size_t index_pos)
 
 
 // Deletes a range of elements
+// Vector cannot be empty.
 CvecError erase_range(Cvec *v, size_t begin, size_t end) 
 {
-    if (v->length == 0) {
-        return CVEC_ERR_EMPTY;
-    }
+	if (v == NULL) return CVEC_ERR_NULL;
+    if (v->length == 0) return CVEC_ERR_EMPTY;
 
-    if (begin > end || end >= v->length) {
-        return CVEC_ERR_INVALID_RANGE;
-    }
+    if (begin > end || end >= v->length) return CVEC_ERR_INVALID_RANGE;
 
     size_t count = end - begin + 1;
 
@@ -232,19 +225,24 @@ CvecError erase_range(Cvec *v, size_t begin, size_t end)
 
 CvecError shrink_to_fit(Cvec *v) 
 {
+	if (v == NULL) return CVEC_ERR_NULL;
+
     void *temp = realloc(v->data, v->length * v->element_size);
-    if (temp == NULL) {
+    
+	if (temp == NULL) 
         return CVEC_ERR_ALLOC;
-    }
 
     v->data = temp;
     v->capacity = v->length;
+
     return CVEC_OK;
 }
 
 
-void cvec_free(Cvec *v) 
+CvecError cvec_free(Cvec *v) 
 {
+	if (v == NULL) return CVEC_ERR_NULL;
+
     if (v->datatype == CVEC_STRING) {
         for (size_t i = 0; i < v->length; ++i) {
             char **ptr = (char **)v->data;
@@ -256,4 +254,6 @@ void cvec_free(Cvec *v)
     v->data = NULL;
     v->length = 0;
     v->capacity = 0;
+
+	return CVEC_OK;
 }
