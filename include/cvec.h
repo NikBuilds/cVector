@@ -6,7 +6,11 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>  /* SIZE_MAX */
 
+// Type-generic macros.
+// Provide a convenient, type-safe interface for working with vectors 
+// of different data types without manually calling the type-specific functions.
 #define cvec_init(v, type) \
     _Generic((type)0, \
 		char: init_char, \
@@ -61,6 +65,23 @@
         long double: get_ldouble \
     )(v, index)
 
+#define cvec_replace(v, index, val) \
+    _Generic((val), \
+        char: replace_char, \
+        unsigned char: replace_uchar, \
+        char*: replace_string, \
+        short: replace_short, \
+        int: replace_int, \
+        unsigned int: replace_uint, \
+        long: replace_long, \
+        long long: replace_llong, \
+        unsigned long: replace_ulong, \
+        unsigned long long: replace_ullong, \
+        float: replace_float, \
+        double: replace_double, \
+        long double: replace_ldouble \
+    )(v, index, val)
+
 #define cvec_insert(v, index, val) \
     _Generic((val), \
 		char: insert_char, \
@@ -95,16 +116,20 @@
 		long double*: insert_range_ldouble \
     )((v), (index), (arr), sizeof(arr)/sizeof((arr)[0]))
 
+// Supported error types
 typedef enum error_msg {
-	CVEC_OK,						// 0
-	CVEC_ERR_ALLOC,					// 1
-	CVEC_ERR_INDEX_OUT_OF_BOUNDS,	// 2
-	CVEC_ERR_INVALID_RANGE,			// 3
-	CVEC_ERR_EMPTY,					// 4
-	CVEC_ERR_TYPE
+	CVEC_OK,
+	CVEC_ERR_ALLOC,
+	CVEC_ERR_INDEX_OUT_OF_BOUNDS,
+	CVEC_ERR_INVALID_RANGE,
+	CVEC_ERR_EMPTY,
+	CVEC_ERR_TYPE,
+	CVEC_ERR_NULL_INPUT,
+	CVEC_ERR_OVERFLOW,
+	CVEC_ERR_NULL
 } CvecError;
 
-// Accepted datatype by cvec
+// Accepted datatype's for cvec
 typedef enum cvec_types {
 	CVEC_CHAR,
 	CVEC_UCHAR,
@@ -126,16 +151,12 @@ typedef enum cvec_types {
 typedef struct {
     void *data;          // Pointer at the beginning of the Data-Array
     size_t element_size; // Size of the element (z.B. sizeof(int))
-    size_t length;       // Anzahl der aktuell gespeicherten Elemente
-    size_t capacity;     // Anzahl der Elemente, für die aktuell speicher reserviert wird
+    size_t length;       // Number of the actual saved elements
+    size_t capacity;     // Size of the allocated space
 	CvecType datatype;	 // Datatype of the vector
 } Cvec;
 
-// Return types for the get() function
-/*
- * The value is NULL when an error accours.
- * In err is the specific error.
- */
+// Return types for the get() functions's
 typedef struct {
     char value;			
     CvecError err;		
@@ -260,6 +281,20 @@ GetValueLdouble get_ldouble(Cvec *v, size_t index);
 CvecError erase(Cvec *v, size_t index);
 CvecError erase_range(Cvec *v, size_t begin, size_t end);
 
+CvecError replace_char(Cvec *v, size_t index, char element);
+CvecError replace_uchar(Cvec *v, size_t index, unsigned char element);
+CvecError replace_string(Cvec *v, size_t index, const char* str);
+CvecError replace_short(Cvec *v, size_t index, short element);
+CvecError replace_int(Cvec *v, size_t index, int element);
+CvecError replace_uint(Cvec *v, size_t index, unsigned int element);
+CvecError replace_long(Cvec *v, size_t index, long element);
+CvecError replace_llong(Cvec *v, size_t index, long long element);
+CvecError replace_ulong(Cvec *v, size_t index, unsigned long element);
+CvecError replace_ullong(Cvec *v, size_t index, unsigned long long element);
+CvecError replace_float(Cvec *v, size_t index, float element);
+CvecError replace_double(Cvec *v, size_t index, double element);
+CvecError replace_ldouble(Cvec *v, size_t index, long double element);
+
 CvecError insert_char(Cvec *v, size_t index, char element);
 CvecError insert_uchar(Cvec *v, size_t index, unsigned char element);
 CvecError insert_string(Cvec *v, size_t index, const char* str);
@@ -289,6 +324,6 @@ CvecError insert_range_double(Cvec *v, size_t index, double *arr, size_t arr_len
 CvecError insert_range_ldouble(Cvec *v, size_t index, long double *arr, size_t arr_length);
 
 CvecError shrink_to_fit(Cvec *v);
-void cvec_free(Cvec *v);
+CvecError cvec_free(Cvec *v);
 
 #endif

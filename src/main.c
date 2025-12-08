@@ -1,8 +1,5 @@
 #include "cvec.h"
 
-/*
-TODO: Implement: string functinos, clear, pop_back, comment documentation
-*/
 
 void printCvecValue(Cvec *v, int index) 
 {
@@ -22,86 +19,117 @@ void printCvecValueString(Cvec *v, int index)
 
 
 int main() {
+    // Run a comprehensive cvec test suite for 'int' and 'char*' (string).
+    // Each test prints which function is being tested.
 
-//------------------------
-// Initialize cvec vector
-//------------------------
-	Cvec vector;
-	Cvec vectorStr;
-	//init_cvec(&vector, sizeof(int));
-	cvec_init(&vector, int);
-	cvec_init(&vectorStr, char*);
-	
-	int arr[9] = {1,2,3,4,5,6,7,8,9};
-	int arr2[3] = {15,16,17};
+    // Test with int
+    printf("\n--- Testing cvec with type: int ---\n");
+    Cvec vi;
+    cvec_init(&vi, int);
+    printf("Testing: init (int) -> length=%zu capacity=%zu\n", vi.length, vi.capacity);
 
-	char *str1 = "Hello ich bin string 1";
-	char str2[] = "Und ich bin der zweite String";
-	char *stringArray[] = { "arr1", "arr2", "arr3" };
-	
-	printf("STRING!!!!\n");
-	cvec_push_back(&vectorStr, str1);
-	cvec_push_back(&vectorStr, str2);
-	cvec_push_back(&vectorStr, "Test");
-	cvec_insert_range(&vectorStr, 1, stringArray);
+    printf("Testing: push_back (int)\n");
+    cvec_push_back(&vi, 1);
+    cvec_push_back(&vi, 2);
+    cvec_push_back(&vi, 3);
+    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+	printf("\n");
 
-	for(size_t i = 0; i < vectorStr.length; i++) {
-		printCvecValueString(&vectorStr, i);
-	}
-	printf("STRING ENDE!!!!\n\n");
+    printf("Testing: insert_range (int)\n");
+    int ins_arr[] = {10, 11, 12};
+    cvec_insert_range(&vi, 1, ins_arr);
+    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+	printf("\n");
 
-//--------------------------
-// Push content into vector 
-//--------------------------
-	printf("Fill vector with content!\n");
+    printf("Testing: insert (int) at index 2\n");
+    cvec_insert(&vi, 2, 99);
+    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+	printf("\n");
 
-	cvec_insert_range(&vector, 0, arr);
+    printf("Testing: get (int) at index 2\n");
+    GetValueInt gvi = cvec_get(&vi, 2, int);
+    if (gvi.err == CVEC_OK) printf("get returned: %d\n", gvi.value);
+	printf("\n");
 
-	// Push singel value into vector
-	cvec_push_back(&vector, 10);
+    printf("Testing: replace (int) at index 2 -> 42\n");
+    cvec_replace(&vi, 2, 42);
+    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+	printf("\n");
 
-	cvec_insert_range(&vector, 4, arr2);
-	
-	for(size_t i = 0; i < vector.length; i++) {
-		printCvecValue(&vector, i);
-	}
-	printf("Cvec-length: %zu, Cvec-capacity: %zu, Cvec-sizeof: %zu\n\n", vector.length, vector.capacity, sizeof(vector));
+    printf("Testing: erase (int) at index 1\n");
+    erase(&vi, 1);
+    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+	printf("\n");
 
-	// Insert value at a specific index
-	cvec_insert(&vector, 7, 36);
+    printf("Testing: erase_range (int) from 1 to 2\n");
+    if (vi.length > 2) erase_range(&vi, 1, 2);
+    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+	printf("\n");
 
-	for(size_t i = 0; i < vector.length; i++) {
-		printCvecValue(&vector, i);
-	}
-	printf("Cvec-length: %zu, Cvec-capacity: %zu, Cvec-sizeof: %zu\n\n", vector.length, vector.capacity, sizeof(vector));
+    printf("Testing: shrink_to_fit (int)\n");
+    shrink_to_fit(&vi);
+    printf("After shrink: length=%zu capacity=%zu\n", vi.length, vi.capacity);
+	printf("\n");
 
-//------------------------------
-// Erasing elements from vector
-//------------------------------
-	printf("Deleting elements from vector!\n");
+    printf("Testing: cvec_free (int)\n");
+    cvec_free(&vi);
+    printf("Freed int vector.\n");
+	printf("\n\n");
 
-	erase(&vector, 5);
-	for(size_t i = 0; i < vector.length; i++) {
-		printCvecValue(&vector, i);
-	}
-	printf("Cvec-length: %zu, Cvec-capacity: %zu, Cvec-sizeof: %zu\n\n", vector.length, vector.capacity, sizeof(vector));
-	
-	erase_range(&vector, 1, 3);
-	for(size_t i = 0; i < vector.length; i++) {
-		printCvecValue(&vector, i);
-	}
-	printf("Cvec-length: %zu, Cvec-capacity: %zu, Cvec-sizeof: %zu\n\n", vector.length, vector.capacity, sizeof(vector));
+    // Test with string
+    printf("\n--- Testing cvec with type: string (char*) ---\n");
+    Cvec vs;
+    cvec_init(&vs, char*);
+    printf("Testing: init (string) -> length=%zu capacity=%zu\n", vs.length, vs.capacity);
+	printf("\n");
 
-//------------------------
-// Shrink to fit and free
-//------------------------
-	printf("Shrink cpacity of vecotor to fit actual length and free it!\n");
+    printf("Testing: push_back (string)\n");
+    cvec_push_back(&vs, "first");
+    cvec_push_back(&vs, "second");
+    char tmp_str[] = "temp";
+    cvec_push_back(&vs, tmp_str);
+    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+	printf("\n");
 
-	shrink_to_fit(&vector);
-	printf("Cvec-length: %zu, Cvec-capacity: %zu, Cvec-sizeof: %zu\n\n", vector.length, vector.capacity, sizeof(vector));
+    printf("Testing: insert_range (string)\n");
+    char *sarr[] = {"a", "b", "c"};
+    cvec_insert_range(&vs, 1, sarr);
+    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+	printf("\n");
 
-	cvec_free(&vector);
-	cvec_free(&vectorStr);
+    printf("Testing: insert (string) at index 2\n");
+    cvec_insert(&vs, 2, "inserted");
+    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+	printf("\n");
 
-	return 0; 
+    printf("Testing: get (string) at index 2\n");
+    GetValueString gvs = cvec_get(&vs, 2, char*);
+    if (gvs.err == CVEC_OK) printf("get returned: %s\n", gvs.value);
+	printf("\n");
+
+    printf("Testing: replace (string) at index 2 -> 'replaced'\n");
+    cvec_replace(&vs, 2, "replaced");
+    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+	printf("\n");
+
+    printf("Testing: erase (string) at index 1\n");
+    if (vs.length > 1) erase(&vs, 1);
+    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+	printf("\n");
+
+    printf("Testing: erase_range (string) from 0 to 1\n");
+    if (vs.length > 2) erase_range(&vs, 0, 1);
+    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+	printf("\n");
+
+    printf("Testing: shrink_to_fit (string)\n");
+    shrink_to_fit(&vs);
+    printf("After shrink: length=%zu capacity=%zu\n", vs.length, vs.capacity);
+	printf("\n");
+
+    printf("Testing: cvec_free (string)\n");
+    cvec_free(&vs);
+    printf("Freed string vector.\n");
+
+    return 0;
 }

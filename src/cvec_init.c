@@ -1,3 +1,6 @@
+/* Wrapper implementations for the core init function to support 
+ * different data types. */
+
 #include "cvec.h"
 
 void init_char(Cvec *v) {
