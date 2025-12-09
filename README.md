@@ -37,3 +37,5 @@ cvec_init(&viStr, int);
 cvec_push_back(&viInt, 1);
 cvec_push_back(&vsStr, "first");
 ```
+
+The only exception is the cvec_get() function. Here, the desired type must be specified with each call.
