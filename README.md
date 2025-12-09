@@ -23,7 +23,8 @@ This allows users to call vector operations without explicitly specifying the un
 By initilaising a vector
 
 When initializing a vector, the intended type must be specified. Afterwards, the desired generic macro function can simply be called.  
-´´´C
+
+```C
 // Creating a int vector
 Cvec viInt;
 cvec_init(&viInt, int);
@@ -34,4 +35,4 @@ cvec_init(&viStr, int);
 
 cvec_push_back(&viInt, 1);
 cvec_push_back(&vsStr, "first");
-´´´
+```
