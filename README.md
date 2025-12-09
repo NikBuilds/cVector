@@ -35,7 +35,7 @@ cvec_init(&viStr, int);
 
 // Push values using generic push_back macro
 cvec_push_back(&viInt, 1);
-cvec_push_back(&vsStr, "first");
+cvec_push_back(&viStr, "first");
 ```
 
 The only exception is the `cvec_get()` function. Here, the desired type must be specified with each call.
