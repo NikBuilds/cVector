@@ -45,8 +45,11 @@ This section explains all functions supported by cVector.
 A complete working test is included in **main**, demonstrating each function using the types `int` and `string`. 
 
 ### push_back()  
-This function add's a copy of an element at the end of the vector.  
+This function add's a copy of an element at the **end** of the vector.  
 When the vector is full (i.e., `length == capacity`), the capacity is automatically doubled.  
+
+### get_copy()  
+
 
 ## Known issues
 When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
