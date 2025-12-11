@@ -44,5 +44,4 @@ The only exception is the `cvec_get()` function. Here, the desired type must be 
 This section explains all functions supported by cVector.  
 A complete working test is included in **main**, demonstrating each function using the types `int` and `string`. 
 
-### push_back  
-
+### push_back()  
