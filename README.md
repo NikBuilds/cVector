@@ -41,3 +41,5 @@ cvec_push_back(&viStr, "first");
 The only exception is the `cvec_get()` function. Here, the desired type must be specified with each call.
 
 ## Usage
+This section explains each function that cVector supports.
+However, there is a full working test in **main** that tests each function with the types `int` and `string`.
