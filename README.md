@@ -47,3 +47,36 @@ A complete working test is included in **main**, demonstrating each function usi
 ### push_back()  
 This function add's a copy of an element at the end of the vector.  
 When the vector is full (i.e., `length == capacity`), the capacity is automatically doubled.  
+
+## Known issues
+When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
+Any pointer previously obtained from v->data becomes dangling (invalid), because it still points to the old memory address which is no longer owned by the vector.
+
+Trying to dereference such a pointer results in undefined behavior, which may lead to a crash, corrupted data, or silent memory errors.
+
+```C
+#include <stdio.h>
+#include "cvec.h"
+
+int main() 
+{
+    Cvec v;
+    cvec_init(&v, int);
+
+    // Push some values
+    for (int i = 0; i < 4; i++) {
+        cvec_push_back(&v, i);
+    }
+
+    // Store a pointer to an element IN the vector
+    int* ptr = (int*)((char*)vi.data + 2 * sizeof(int)); // points to element with value 2
+
+    // Vector is full – next push triggers realloc()
+    cvec_push_back(&v, 99);
+
+    // Now ptr is dangling (points to old freed memory)
+    printf("ptr = %d\n", *ptr);  // Undefined behavior!
+
+    return 0;
+}
+```
