@@ -76,6 +76,7 @@ int main() {
     printf("Freed int vector.\n");
 	printf("\n\n");
 
+
     // Test with string
     printf("\n--- Testing cvec with type: string (char*) ---\n");
     Cvec vs;
@@ -103,8 +104,8 @@ int main() {
 	printf("\n");
 
     printf("Testing: get (string) at index 2\n");
-    GetValueString gvs = cvec_get(&vs, 2, char*);
-    if (gvs.err == CVEC_OK) printf("get returned: %s\n", gvs.value);
+	GetValueString gvs = cvec_get(&vs, 2, char*);
+	if (gvs.err == CVEC_OK) printf("get returned: %s\n", gvs.value);
 	printf("\n");
 
     printf("Testing: replace (string) at index 2 -> 'replaced'\n");
@@ -130,6 +131,31 @@ int main() {
     printf("Testing: cvec_free (string)\n");
     cvec_free(&vs);
     printf("Freed string vector.\n");
+
+
+    printf("\n--- Testing cvec emplace_back with: int, string and struct type ---\n");
+	int test;	// Target where the value will be written
+	Cvec ints;
+	cvec_init(&ints, int);
+
+	printf("Test with: int");
+
+	cvec_emplace_back(&ints, int, test);
+	test = 123;	// Writes directly into the vector
+
+	typedef struct {
+		char name[32];
+		int age;
+	} Person;
+
+	Person person;
+
+	Cvec vPerson;
+	cvec_init(&vPerson, sizeof(person));
+
+	cvec_emplace_back(&vPerson, Person, person);
+	strcpy(p.name, "Alice");
+	person.age = 30;
 
     return 0;
 }

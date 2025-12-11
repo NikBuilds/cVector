@@ -116,6 +116,10 @@
 		long double*: insert_range_ldouble \
     )((v), (index), (arr), sizeof(arr)/sizeof((arr)[0]))
 
+#define cvec_emplace_back(v, type, slot) \
+    cvec_emplace_back_generic((v), sizeof(type), (void**)&(slot))
+
+
 // Supported error types
 typedef enum error_msg {
 	CVEC_OK,
@@ -322,6 +326,8 @@ CvecError insert_range_ullong(Cvec *v, size_t index, unsigned long long *arr, si
 CvecError insert_range_float(Cvec *v, size_t index, float *arr, size_t arr_length);
 CvecError insert_range_double(Cvec *v, size_t index, double *arr, size_t arr_length);
 CvecError insert_range_ldouble(Cvec *v, size_t index, long double *arr, size_t arr_length);
+
+CvecError cvec_emplace_back_generic(Cvec *v, size_t element_size, void **slot);
 
 CvecError shrink_to_fit(Cvec *v);
 CvecError cvec_free(Cvec *v);
