@@ -17,6 +17,7 @@ The library supports all basic datatypes:
 - float
 - double
 - long double
+- struct
 
 The `_Generic` keyword in C allows the implementation of type-generic macros that automatically select the correct function based on the argument’s type.
 This enables users to call vector functions without manually specifying the underlying data type each time.
