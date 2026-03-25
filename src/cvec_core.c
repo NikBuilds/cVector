@@ -36,7 +36,7 @@ CvecError push_back(Cvec *v, void *element, CvecType expected_type)
 
     v->length++;
     return CVEC_OK;
-	}
+}
 
 
 // Copies the element at the given index from the vector into the memory pointed
@@ -78,7 +78,7 @@ CvecError replace(Cvec *v, size_t index, void *element, CvecType expected_type)
 	
 		if (!tmp) return CVEC_ERR_ALLOC;
         
-		v->data = tmp;
+			v->data = tmp;
 		v->capacity = new_capacity;
 	}
 
@@ -221,6 +221,50 @@ CvecError erase_range(Cvec *v, size_t begin, size_t end)
     memmove(dest, src, bytes_to_move);
 
     v->length -= count;
+    return CVEC_OK;
+}
+
+
+// Access an element directly of the vetor 
+CvecError at(Cvec *v, size_t index, void* dest) 
+{
+	if (v == NULL) return CVEC_ERR_NULL;
+	if (v->length == 0) return CVEC_ERR_EMPTY;
+	if (dest == NULL) return CVEC_ERR_NULL;
+    if (index >= v->length) return CVEC_ERR_INDEX_OUT_OF_BOUNDS;
+	
+	dest = (char *)v->data + index * v->element_size;
+	return CVEC_OK;
+}
+
+
+// Adds an element at the end of the vector without making a copy
+CvecError cvec_emplace_back_generic(Cvec *v, size_t element_size, void **slot)
+{
+    if (v == NULL) return CVEC_ERR_NULL;
+
+    if (v->element_size != element_size)
+        return CVEC_ERR_TYPE;
+
+    if (v->length == v->capacity)
+    {
+        size_t new_cap = v->capacity ? v->capacity * 2 : 1;
+
+        if (new_cap > SIZE_MAX / element_size)
+            return CVEC_ERR_OVERFLOW;
+
+        void *tmp = realloc(v->data, new_cap * element_size);
+        if (!tmp)
+            return CVEC_ERR_ALLOC;
+
+        v->data = tmp;
+        v->capacity = new_cap;
+    }
+
+    // Return the last adress inside the vector
+    *slot = (char*)v->data + v->length * element_size;
+
+    v->length++;
     return CVEC_OK;
 }
 

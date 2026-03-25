@@ -32,38 +32,45 @@ int main() {
     cvec_push_back(&vi, 1);
     cvec_push_back(&vi, 2);
     cvec_push_back(&vi, 3);
-    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+    for (size_t i = 0; i < vi.length; ++i) 
+		printCvecValue(&vi, i);
 	printf("\n");
 
     printf("Testing: insert_range (int)\n");
     int ins_arr[] = {10, 11, 12};
     cvec_insert_range(&vi, 1, ins_arr);
-    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+    for (size_t i = 0; i < vi.length; ++i) 
+		printCvecValue(&vi, i);
 	printf("\n");
 
     printf("Testing: insert (int) at index 2\n");
     cvec_insert(&vi, 2, 99);
-    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+    for (size_t i = 0; i < vi.length; ++i) 
+		printCvecValue(&vi, i);
 	printf("\n");
 
     printf("Testing: get (int) at index 2\n");
     GetValueInt gvi = cvec_get(&vi, 2, int);
-    if (gvi.err == CVEC_OK) printf("get returned: %d\n", gvi.value);
+    if (gvi.err == CVEC_OK) 
+		printf("get returned: %d\n", gvi.value);
 	printf("\n");
 
     printf("Testing: replace (int) at index 2 -> 42\n");
     cvec_replace(&vi, 2, 42);
-    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+    for (size_t i = 0; i < vi.length; ++i)
+		printCvecValue(&vi, i);
 	printf("\n");
 
     printf("Testing: erase (int) at index 1\n");
     erase(&vi, 1);
-    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+    for (size_t i = 0; i < vi.length; ++i) 
+		printCvecValue(&vi, i);
 	printf("\n");
 
     printf("Testing: erase_range (int) from 1 to 2\n");
     if (vi.length > 2) erase_range(&vi, 1, 2);
-    for (size_t i = 0; i < vi.length; ++i) printCvecValue(&vi, i);
+    for (size_t i = 0; i < vi.length; ++i) 
+		printCvecValue(&vi, i);
 	printf("\n");
 
     printf("Testing: shrink_to_fit (int)\n");
@@ -75,6 +82,7 @@ int main() {
     cvec_free(&vi);
     printf("Freed int vector.\n");
 	printf("\n\n");
+
 
     // Test with string
     printf("\n--- Testing cvec with type: string (char*) ---\n");
@@ -88,38 +96,45 @@ int main() {
     cvec_push_back(&vs, "second");
     char tmp_str[] = "temp";
     cvec_push_back(&vs, tmp_str);
-    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+    for (size_t i = 0; i < vs.length; ++i) 
+		printCvecValueString(&vs, i);
 	printf("\n");
 
     printf("Testing: insert_range (string)\n");
     char *sarr[] = {"a", "b", "c"};
     cvec_insert_range(&vs, 1, sarr);
-    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+    for (size_t i = 0; i < vs.length; ++i) 
+		printCvecValueString(&vs, i);
 	printf("\n");
 
     printf("Testing: insert (string) at index 2\n");
     cvec_insert(&vs, 2, "inserted");
-    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+    for (size_t i = 0; i < vs.length; ++i) 
+		printCvecValueString(&vs, i);
 	printf("\n");
 
     printf("Testing: get (string) at index 2\n");
-    GetValueString gvs = cvec_get(&vs, 2, char*);
-    if (gvs.err == CVEC_OK) printf("get returned: %s\n", gvs.value);
+	GetValueString gvs = cvec_get(&vs, 2, char*);
+	if (gvs.err == CVEC_OK) 
+		printf("get returned: %s\n", gvs.value);
 	printf("\n");
 
     printf("Testing: replace (string) at index 2 -> 'replaced'\n");
     cvec_replace(&vs, 2, "replaced");
-    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+    for (size_t i = 0; i < vs.length; ++i) 
+		printCvecValueString(&vs, i);
 	printf("\n");
 
     printf("Testing: erase (string) at index 1\n");
     if (vs.length > 1) erase(&vs, 1);
-    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+    for (size_t i = 0; i < vs.length; ++i) 
+		printCvecValueString(&vs, i);
 	printf("\n");
 
     printf("Testing: erase_range (string) from 0 to 1\n");
     if (vs.length > 2) erase_range(&vs, 0, 1);
-    for (size_t i = 0; i < vs.length; ++i) printCvecValueString(&vs, i);
+    for (size_t i = 0; i < vs.length; ++i)	
+		printCvecValueString(&vs, i);
 	printf("\n");
 
     printf("Testing: shrink_to_fit (string)\n");
@@ -130,6 +145,71 @@ int main() {
     printf("Testing: cvec_free (string)\n");
     cvec_free(&vs);
     printf("Freed string vector.\n");
+	printf("\n\n");
+
+	// Test emplace_back
+    printf("\n--- Testing cvec emplace_back with: int, string and struct ---\n\n");
+	printf("Testing emplace_back (int)\n");
+	Cvec vint;
+    cvec_init(&vint, int);
+
+    int *iptr = NULL;
+
+    cvec_emplace_back(&vint, int, iptr);
+    *iptr = 123;
+    cvec_emplace_back(&vint, int, iptr);
+    *iptr = 456;
+
+	for (size_t i = 0; i < vint.length; ++i)
+        printCvecValue(&vint, i);
+	
+	cvec_free(&vint);
+    printf("\n");
+
+    printf("Testing emplace_back (string)\n");
+	Cvec vstr;
+    cvec_init(&vstr, char*);
+
+    char **sptr = NULL;
+
+    cvec_emplace_back(&vstr, char*, sptr);
+    *sptr = strdup("Alice");
+
+    cvec_emplace_back(&vstr, char*, sptr);
+    *sptr = strdup("Bob");
+
+    for (size_t i = 0; i < vstr.length; ++i)
+        printCvecValueString(&vstr, i);
+
+    cvec_free(&vstr);
+    printf("\n");
+
+	typedef struct {
+		char name[32];
+		int age;
+	} Person;
+
+	printf("Testing emplace_back (struct)\n");
+	printf("Testing: init (struct) -> length=%zu capacity=%zu\n", vs.length, vs.capacity);
+	Cvec vPerson;
+	cvec_init(&vPerson, Person);
+
+	Person *p = NULL;
+
+	cvec_emplace_back(&vPerson, Person, p);
+    strcpy(p->name, "Alice");
+    p->age = 30;
+
+    cvec_emplace_back(&vPerson, Person, p);
+    strcpy(p->name, "Bob");
+    p->age = 42;
+
+    for (size_t i = 0; i < vPerson.length; ++i) {
+        Person *pi = (Person*)((char*)vPerson.data + i * sizeof(Person));
+        printf("Person %zu: name=%s age=%d\n", i, pi->name, pi->age);
+    }
+
+	cvec_free(&vPerson);
 
     return 0;
 }
