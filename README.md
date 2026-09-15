@@ -32,7 +32,7 @@ cvec_init(&viInt, int);
 
 // Creating a string vector
 Cvec viStr;
-cvec_init(&viStr, int);
+cvec_init(&viStr, char*);
 
 // Push values using generic push_back macro
 cvec_push_back(&viInt, 1);
