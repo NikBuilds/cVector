@@ -125,6 +125,184 @@ cvec_push_back(&strings, "hello");
 - Pointers into the vector become invalid after a push (see [Known issues](#known-issues)).
 ---
 
+### `cvec_get(v, index, type)`
+ 
+Reads the element at `index` and returns it wrapped in a result struct (`GetValueInt`, `GetValueDouble`, `GetValueString`, …).
+ 
+```c
+GetValueInt r = cvec_get(&v, 2, int);
+if (r.err == CVEC_OK)
+    printf("%d\n", r.value);
+ 
+GetValueString s = cvec_get(&strings, 0, char*);
+```
+ 
+- Unlike the other macros, the **type must be passed** here, because the return type depends on it.
+- The struct has two members: `value` and `err`. **Check `err` before you use `value`**; on an error `value` is not meaningful.
+- Errors: `CVEC_ERR_EMPTY`, `CVEC_ERR_INDEX_OUT_OF_BOUNDS`, `CVEC_ERR_NULL`. The wrappers currently report all of them as `CVEC_ERR_INDEX_OUT_OF_BOUNDS`.
+- For numbers you get a copy. For strings, `value` is the **pointer to the vector's own string**, not a new copy. Do not `free` it and do not use it after the element was replaced, erased or the vector was freed. Copy it with `strdup` if you need it longer.
+- Structs have no `cvec_get`. Use `cvec_emplace_back` to write and read them via `v.data` (see below).
+---
+ 
+### `cvec_replace(v, index, value)`
+ 
+Overwrites the element at `index` with `value`. The length does not change.
+ 
+```c
+cvec_replace(&v, 2, 42);
+cvec_replace(&strings, 0, "new text");
+```
+ 
+- Only works on existing elements: an empty vector returns `CVEC_ERR_EMPTY`, an index `>= length` returns `CVEC_ERR_INDEX_OUT_OF_BOUNDS`.
+- Same rules for the value type as `cvec_push_back`. Strings are copied with `strdup`.
+---
+ 
+### `cvec_insert(v, index, value)`
+ 
+Inserts `value` at `index` and shifts all following elements one place to the right. The length grows by one.
+ 
+```c
+// before: [1, 2, 3]
+cvec_insert(&v, 1, 99);
+// after:  [1, 99, 2, 3]
+```
+ 
+**How it works:** If the vector is full, the capacity doubles. Then `memmove` shifts the block from `index` to the end by one element, and the new value is copied into the gap. Shifting is O(n), so inserting in the middle gets slower with large vectors.
+ 
+**Watch out:**
+- `index` has to point to an **existing** element (`index < length`), and the vector must not be empty. To append at the end, use `cvec_push_back`.
+- Strings are copied with `strdup`.
+---
+ 
+### `cvec_insert_range(v, index, arr)`
+ 
+Inserts a whole array at `index` in one step.
+ 
+```c
+int nums[] = {10, 11, 12};
+cvec_insert_range(&v, 1, nums);
+// before: [1, 2, 3]  ->  after: [1, 10, 11, 12, 2, 3]
+ 
+char *names[] = {"a", "b", "c"};
+cvec_insert_range(&strings, 0, names);
+```
+ 
+**How it works:** The number of elements is calculated by the macro itself with `sizeof(arr) / sizeof((arr)[0])`, so you don't pass a length. The capacity is doubled until the new elements fit (so there is **one** `realloc` instead of many), the existing elements are shifted once with `memmove`, and the array is copied in with one `memcpy`.
+ 
+**Watch out:**
+- Pass a **real array** (like `nums` above). If you pass a pointer (a function parameter or `malloc`ed memory), `sizeof` returns the size of the pointer and the length is wrong.
+- Here `index` may be equal to `length`, which appends the array at the end.
+- For string arrays every string is copied with `strdup`.
+---
+ 
+### `erase(v, index)`
+ 
+Removes the element at `index`. All following elements move one place to the left and the length shrinks by one.
+ 
+```c
+// before: [1, 2, 3, 4]
+erase(&v, 1);
+// after:  [1, 3, 4]
+```
+ 
+- Errors: `CVEC_ERR_EMPTY` on an empty vector, `CVEC_ERR_INDEX_OUT_OF_BOUNDS` if `index >= length`.
+- The capacity stays the same. Use `shrink_to_fit` to give the memory back.
+- Pointers to elements after `index` now point to the shifted data.
+---
+ 
+### `erase_range(v, begin, end)`
+ 
+Removes all elements from `begin` to `end`, **both included**.
+ 
+```c
+// before: [1, 2, 3, 4, 5]
+erase_range(&v, 1, 3);
+// after:  [1, 5]
+```
+ 
+- Returns `CVEC_ERR_INVALID_RANGE` if `begin > end` or `end >= length`.
+- The remaining elements are moved with a single `memmove`, which is faster than calling `erase` in a loop.
+---
+ 
+### `at(v, index, dest)`
+ 
+Direct access to the element at `index` without copying.
+ 
+- `dest` must not be `NULL`; the usual index and empty checks apply.
+---
+ 
+### `cvec_emplace_back(v, type, slot_ptr)`
+ 
+Adds a new element at the end **without copying a value** and gives you a pointer to the new slot, so you can fill it in place. This is the way to work with `struct`s.
+ 
+```c
+typedef struct {
+    char name[32];
+    int  age;
+} Person;
+ 
+Cvec people;
+cvec_init(&people, Person);
+ 
+Person *p = NULL;
+cvec_emplace_back(&people, Person, p);   // p now points to the new slot
+strcpy(p->name, "Alice");
+p->age = 30;
+ 
+// read back element i
+Person *q = (Person *)((char *)people.data + i * sizeof(Person));
+```
+ 
+It also works with the other types:
+ 
+```c
+int *ip = NULL;
+cvec_emplace_back(&ints, int, ip);
+*ip = 123;
+ 
+char **sp = NULL;
+cvec_emplace_back(&strs, char*, sp);
+*sp = strdup("Alice");   // you create the string yourself
+```
+ 
+**How it works:** Like `push_back`, it doubles the capacity if needed. Then it sets your pointer to the address of the first free slot and increases `length` by one. Nothing is copied or initialized.
+ 
+**Watch out:**
+- The slot is **uninitialized**. Fill every field before you read it.
+- The pointer is only valid until the next call that may grow the vector (`push_back`, `insert`, `emplace_back`, …). Use it right away and don't keep it.
+- Use the same type as in `cvec_init` (the element size is compared; a mismatch returns `CVEC_ERR_TYPE`).
+- For strings you must allocate the text yourself (`strdup`/`malloc`). `cvec_free` calls `free` on it later, so do **not** store string literals or stack buffers.
+- Pass the pointer *variable*, not its address. The macro takes the address itself.
+---
+ 
+### `shrink_to_fit(v)`
+ 
+Reduces the capacity to the current length and returns the unused memory with `realloc`.
+ 
+```c
+printf("%zu / %zu\n", v.length, v.capacity);   // 3 / 8
+shrink_to_fit(&v);
+printf("%zu / %zu\n", v.length, v.capacity);   // 3 / 3
+```
+ 
+Call it when you are done filling a vector that will stay around for a long time. The next `push_back` will have to grow the vector again. As with every reallocation, the data may move, so old pointers into the vector become invalid.
+ 
+---
+ 
+### `cvec_free(v)`
+ 
+Releases all memory of the vector. **Call it exactly once for every initialized vector**, otherwise you leak memory.
+ 
+```c
+cvec_free(&v);
+```
+ 
+- For string vectors, every stored string is freed first, then the data block.
+- Afterwards `data` is `NULL` and `length` and `capacity` are `0`. The vector keeps its type, so it can be filled again without a new `cvec_init`.
+- The vector itself (`Cvec v`) is not freed, because it lives on your stack. The vector must not contain pointers you still need (e.g. strings from `cvec_get`).
+---
+
+
 
 ## Known issues
 When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
