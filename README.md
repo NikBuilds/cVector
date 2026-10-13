@@ -300,9 +300,6 @@ cvec_free(&v);
 - For string vectors, every stored string is freed first, then the data block.
 - Afterwards `data` is `NULL` and `length` and `capacity` are `0`. The vector keeps its type, so it can be filled again without a new `cvec_init`.
 - The vector itself (`Cvec v`) is not freed, because it lives on your stack. The vector must not contain pointers you still need (e.g. strings from `cvec_get`).
----
-
-
 
 ## Known issues
 When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
