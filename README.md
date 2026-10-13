@@ -72,7 +72,7 @@ if (r.err == CVEC_OK)
 cvec_free(&v);
 ```
 
-Cvec stores the pointer to the data (`data`), the size of one element (`element_size`), the number of stored elements (`length`), the allocated space in elements (`capacity`) and the element type (`datatype`). You can read length and capacity directly, but don't write to any field yourself. Indices always start at 0. All functions check their arguments and return an error instead of crashing, so the vector is left unchanged when an error is returned.
+Cvec stores the pointer to the data (`data`), the size of one element (`element_size`), the number of stored elements (`length`), the allocated space in elements (`capacity`) and the element type (`datatype`). You can read length and capacity directly, but don't write to any field yourself.
 
 Almost every function returns a `CvecError`. Always compare it with `CVEC_OK`:
 | Code | Meaning |
@@ -86,6 +86,7 @@ Almost every function returns a `CvecError`. Always compare it with `CVEC_OK`:
 | `CVEC_ERR_NULL_INPUT` | An input array is `NULL` (with `count > 0`) |
 | `CVEC_ERR_OVERFLOW` | The new size would overflow `size_t` |
 | `CVEC_ERR_NULL` | A passed pointer (vector, value, destination) is `NULL` |
+Indices always start at `0`. All functions check their arguments and return an error instead of crashing, so the vector is left unchanged when an error is returned.
 
 ## Known issues
 When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
