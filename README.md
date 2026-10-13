@@ -56,6 +56,28 @@ The only exception's are the `cvec_get()` and `emplace_back()` function's. Here,
 ## Usage
 A complete working test is included in **main**, demonstrating each function using the types `int` and `string`. 
 
+### Basics
+Every vector is a Cvec. You create it on your own (usually on the stack), initialize it, work with it and free it at the end:
+```C
+Cvec v;
+cvec_init(&v, int);
+
+cvec_push_back(&v, 10);
+cvec_push_back(&v, 20);
+
+GetValueInt r = cvec_get(&v, 1, int);
+if (r.err == CVEC_OK)
+    printf("%d\n", r.value);   // 20
+
+cvec_free(&v);
+```
+
+Cvec stores the pointer to the data (`data`), the size of one element (`element_size`), the number of stored elements (`length`), the allocated space in elements (`capacity`) and the element type (`datatype`). You can read length and capacity directly, but don't write to any field yourself. Indices always start at 0. All functions check their arguments and return an error instead of crashing, so the vector is left unchanged when an error is returned.
+
+Almost every function returns a `CvecError`. Always compare it with `CVEC_OK`:
+
+
+
 ## Known issues
 When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
 Any pointer previously obtained from v->data becomes dangling (invalid), because it still points to the old memory address which is no longer owned by the vector.
