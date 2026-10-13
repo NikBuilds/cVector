@@ -2,6 +2,18 @@
 A dynamic array implemented in C that emulates basic functionality of a C++ vector.  
 This project was created to offer a fast and simple solution for dynamic arrays in C and focuses on user-friendliness.
 
+## Build and include
+cVector needs a C11 compiler because it relies on `_Generic`. Add `include/` to your include path, compile the three source files together with your own code and include the header:
+
+```C
+#include "cvec.h"
+```
+```Bash
+gcc -std=c11 -Iinclude your_code.c src/cvec_core.c src/cvec_global.c src/cvec_init.c -o your_program
+```
+
+The included `Makefile` builds the demo in `src/main.c`: `make` builds it, `make run` builds and runs it, `make clean` removes the build folder.
+
 ## Features
 The library supports all basic datatypes:
 - char
