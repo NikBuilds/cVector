@@ -86,6 +86,7 @@ Almost every function returns a `CvecError`. Always compare it with `CVEC_OK`:
 | `CVEC_ERR_NULL_INPUT` | An input array is `NULL` (with `count > 0`) |
 | `CVEC_ERR_OVERFLOW` | The new size would overflow `size_t` |
 | `CVEC_ERR_NULL` | A passed pointer (vector, value, destination) is `NULL` |
+
 Indices always start at `0`. All functions check their arguments and return an error instead of crashing, so the vector is left unchanged when an error is returned.
 
 ## Known issues
