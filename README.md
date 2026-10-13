@@ -2,7 +2,7 @@
 A dynamic array implemented in C that emulates basic functionality of a C++ vector.  
 This project was created to offer a fast and simple solution for dynamic arrays in C and focuses on user-friendliness.
 
-## Build and include
+## 1.0 Build and include
 cVector needs a C11 compiler because it relies on `_Generic`. Add `include/` to your include path, compile the three source files together with your own code and include the header:
 
 ```C
@@ -14,7 +14,7 @@ gcc -std=c11 -Iinclude your_code.c src/cvec_core.c src/cvec_global.c src/cvec_in
 
 The included `Makefile` builds the demo in `src/main.c`: `make` builds it, `make run` builds and runs it, `make clean` removes the build folder.
 
-## Features
+## 2.0 Features
 The library supports all basic datatypes:
 - char
 - unsigned char
@@ -53,10 +53,10 @@ cvec_push_back(&viStr, "first");
 
 The only exception's are the `cvec_get()` and `emplace_back()` function's. Here, the desired type must be specified with each call.
 
-## Usage
+## 3.0 Usage
 A complete working test is included in **main**, demonstrating each function using the types `int` and `string`. 
 
-### Basics
+### 3.1 Basics
 Every vector is a Cvec. You create it on your own (usually on the stack), initialize it, work with it and free it at the end:
 ```C
 Cvec v;
@@ -89,7 +89,7 @@ Almost every function returns a `CvecError`. Always compare it with `CVEC_OK`:
 
 Indices always start at `0`. All functions check their arguments and return an error instead of crashing, so the vector is left unchanged when an error is returned.
 
----
+### 3.2 Functions
  
 ### `cvec_init(v, type)`
  
@@ -301,7 +301,7 @@ cvec_free(&v);
 - Afterwards `data` is `NULL` and `length` and `capacity` are `0`. The vector keeps its type, so it can be filled again without a new `cvec_init`.
 - The vector itself (`Cvec v`) is not freed, because it lives on your stack. The vector must not contain pointers you still need (e.g. strings from `cvec_get`).
 
-## Known issues
+## 4.0 Known issues
 When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
 Any pointer previously obtained from v->data becomes dangling (invalid), because it still points to the old memory address which is no longer owned by the vector.
 
