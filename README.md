@@ -89,6 +89,43 @@ Almost every function returns a `CvecError`. Always compare it with `CVEC_OK`:
 
 Indices always start at `0`. All functions check their arguments and return an error instead of crashing, so the vector is left unchanged when an error is returned.
 
+---
+ 
+### `cvec_init(v, type)`
+ 
+Prepares an empty vector for elements of the given `type`.
+ 
+```c
+Cvec a; cvec_init(&a, int);
+Cvec b; cvec_init(&b, char*);     // string vector
+Cvec c; cvec_init(&c, Person);    // any struct
+```
+ 
+- `type` is written as a type, not as a value: `int`, `double`, `char*`, `Person`.
+- No memory is allocated yet. `data` is `NULL` and `capacity` is `0`. The first `push_back` allocates.
+- The macro passes `sizeof(type)` to the matching init function, which checks that it fits the type. Every type that is not in the list above is treated as a struct.
+- A vector has a fixed type. Afterwards, functions with a different value type return `CVEC_ERR_TYPE`.
+- Do not call `cvec_init` on a vector that already holds data, otherwise its memory is lost (call `cvec_free` first).
+---
+ 
+### `cvec_push_back(v, value)`
+ 
+Appends a **copy** of `value` at the end.
+ 
+```c
+cvec_push_back(&v, 42);
+cvec_push_back(&strings, "hello");
+```
+ 
+**How it works:** If `length == capacity`, the capacity doubles (`0 → 1 → 2 → 4 → 8 …`) and the block is enlarged with `realloc`. Then the value is copied to position `length`, and `length` goes up by one. Doubling keeps pushing cheap on average (amortized O(1)), because a reallocation only happens rarely.
+ 
+**Watch out:**
+- The literal's type decides which function is used: `1` is an `int`, `1L` a `long`, `1.0f` a `float`, `1.0` a `double`. If it doesn't match the vector, you get `CVEC_ERR_TYPE`. Use a cast (e.g. `(short)5`) when needed.
+- **Strings:** the text is copied with `strdup`. The vector owns that copy, so you can pass literals, stack buffers or temporary strings. The copies are released by `cvec_free`.
+- Pointers into the vector become invalid after a push (see [Known issues](#known-issues)).
+---
+
+
 ## Known issues
 When realloc is triggered by doubleling the capacity by adding a new element, the underlying memory block of the vector may move to a new location.
 Any pointer previously obtained from v->data becomes dangling (invalid), because it still points to the old memory address which is no longer owned by the vector.
